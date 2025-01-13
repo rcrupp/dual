@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: dual
+  datasource:
+    primary:
+      jdbc-url: jdbc:postgresql://localhost:5432/db1
+      username: user1
+      password: password1
+      driver-class-name: org.postgresql.Driver
+    secondary:
+      jdbc-url: jdbc:postgresql://localhost:5433/db2
+      username: user2
+      password: password2
+      driver-class-name: org.postgresql.Driver

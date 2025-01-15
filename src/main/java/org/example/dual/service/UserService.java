@@ -2,32 +2,30 @@ package org.example.dual.service;
 
 import org.example.dual.primary.model.PrimaryUser;
 import org.example.dual.primary.repository.PrimaryUserRepository;
-import org.example.dual.secondary.model.SecondaryUser;
-import org.example.dual.secondary.repository.SecondaryUserRepository;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
     private final PrimaryUserRepository primaryUserRepo;
-    private final SecondaryUserRepository secondaryUserRepo;
+    private final JdbcTemplate jdbcTemplate;
 
-    public UserService(PrimaryUserRepository primaryUserRepo, SecondaryUserRepository secondaryUserRepo) {
+    public UserService(PrimaryUserRepository primaryUserRepo, JdbcTemplate secondaryUserTemplate) {
         this.primaryUserRepo = primaryUserRepo;
-        this.secondaryUserRepo = secondaryUserRepo;
+        this.jdbcTemplate = secondaryUserTemplate;
     }
 
     public PrimaryUser savePrimaryUser(PrimaryUser user) {
         return primaryUserRepo.save(user);
     }
 
-    public SecondaryUser saveSecondaryUser(SecondaryUser user) {
-        return secondaryUserRepo.save(user);
-    }
-
     public PrimaryUser createUser(String name) {
-        SecondaryUser secondaryUser = new SecondaryUser();
-        secondaryUser.setName(name);
-        saveSecondaryUser(secondaryUser);
+        try {
+            jdbcTemplate.execute("INSERT INTO users (name) VALUES ('" + name + "')");
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         PrimaryUser primaryUser = new PrimaryUser();
         primaryUser.setName(name);
         return savePrimaryUser(primaryUser);
